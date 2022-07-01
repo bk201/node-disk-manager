@@ -354,6 +354,7 @@ func (c *Controller) provisionDeviceToNode(device *diskv1.BlockDevice) error {
 		Config: make(map[string]string),
 	}
 
+	foundNode := false
 	for i, no := range node.Spec.Storage.Nodes {
 		if no.Name == c.NodeName {
 			if len(no.Devices) == 0 {
@@ -374,9 +375,20 @@ func (c *Controller) provisionDeviceToNode(device *diskv1.BlockDevice) error {
 					}
 				}
 			}
+			foundNode = true
 			break
 		}
 	}
+
+	if !foundNode {
+		nodeCpy.Spec.Storage.Nodes = append(nodeCpy.Spec.Storage.Nodes, rcv1.Node{
+			Name: c.NodeName,
+			Selection: rcv1.Selection{
+				Devices: []rcv1.Device{diskSpec},
+			},
+		})
+	}
+
 	if _, err := c.Nodes.Update(nodeCpy); err != nil {
 		return err
 	}
