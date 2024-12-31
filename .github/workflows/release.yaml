@@ -6,9 +6,17 @@ on:
     - v**
 
 jobs:
-  build-for-release:
-    uses: ./.github/workflows/factory.yaml
+  # build-for-release:
+  #   uses: ./.github/workflows/factory.yaml
+  #   with:
+  #     tag: ${{ github.ref_name }}
+  #     push: true
+  #   secrets: inherit
+  create-harvester-pr:
+    # needs: build-for-release
+    uses: ./.github/workflows/create-image-bump-pr.yaml
     with:
-      tag: ${{ github.ref_name }}
-      push: true
+      component: harvester-node-disk-manager
+      version: ${{ github.ref_name }}
+      harvester_repo: bk201/harvester
     secrets: inherit
